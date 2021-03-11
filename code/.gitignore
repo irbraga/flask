@@ -1,5 +1,6 @@
 __pycache__/
 migrations/
+tests_coverage_report/
 venv/
 virtualenv/
 database.db
