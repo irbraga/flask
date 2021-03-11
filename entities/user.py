@@ -1,16 +1,20 @@
+'''
+Module with User database mapping.
+'''
 import base64
 import datetime
 from uuid import uuid4
 from typing import List
 from sqlalchemy import Column, String, Date, DateTime, Enum
-from werkzeug.exceptions import BadRequest, Unauthorized
 from decorators.type import GUID
-from plugins.sqlalchemy import db
+from extensions.sqlalchemy import db
 from entities.types import RoleType
 
 
-
 class User(db.Model):
+    '''
+    User model.
+    '''
     __tablename__ = 'users'
 
     uuid = Column(GUID, primary_key=True, default=uuid4)
@@ -24,29 +28,46 @@ class User(db.Model):
 
     @property
     def password(self):
+        '''
+        Password property getter.
+        '''
         return self._password
 
     @password.setter
     def password(self, value) -> None:
+        '''
+        Password setter.
+        '''
         self._password = base64.b64encode(value.encode('utf-8'))
-    
+
     def check_password(self, password: str) -> bool:
+        '''
+        Return True with the provided password matches with the class password.
+        Otherwise, return False.
+        '''
         encoded_password = base64.b64encode(password.encode('utf-8'))
         if self._password == encoded_password:
             return True
-        raise Unauthorized('Password verification failed.')
 
     @classmethod
     def get_by_uuid(cls, uuid: str) -> 'User':
+        '''
+        Find a User by UUID.
+        '''
         return cls.query.filter_by(uuid = uuid).first()
-    
+
     @classmethod
     def get_by_username(cls, username: str) -> 'User':
+        '''
+        Find a User by username.
+        '''
         user = cls.query.filter_by(username = username).first()
         if user:
             return user
-        raise BadRequest(f"User with username \'{username}\' not found.")
 
     @classmethod
     def list_by_role(cls, role: str) -> List['User']:
+        '''
+        List Users by Role.
+        '''
         return cls.query.filter_by(role = role).all()

@@ -1,6 +1,14 @@
+'''
+Module with the variables for Flask and other extensions.
+'''
 import datetime
 
+# pylint: disable=too-few-public-methods
+
 class ServerConfig:
+    '''
+    Class config for Flask and other extensions.
+    '''
 
     # Flask-JWT-Extended
     JWT_SECRET_KEY = 'andromeda'

@@ -1,3 +1,7 @@
+'''
+Module for Gunicorn configuration.
+'''
+# pylint: disable=invalid-name
 # https://docs.gunicorn.org/en/stable/configure.html#configuration-file
 # https://docs.gunicorn.org/en/stable/settings.html#settings
 import multiprocessing

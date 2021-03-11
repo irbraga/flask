@@ -1,6 +1,9 @@
+'''
+Module to add command line functionalities to Flask.
+'''
 import datetime
 from flask.cli import AppGroup
-from plugins.sqlalchemy import db
+from extensions.sqlalchemy import db
 from entities.user import User
 from entities.types import RoleType
 
@@ -8,7 +11,9 @@ db_cli = AppGroup('database')
 
 @db_cli.command()
 def load():
-
+    '''
+    Erase and insert initial data to database.
+    '''
     # Erase all data
     User.query.delete()
 

@@ -1,16 +1,26 @@
-import datetime
+'''
+Module with namespace for authentication endpoint services.
+'''
 from http import HTTPStatus
 from flask import request
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import get_jti, jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
+from werkzeug.exceptions import Unauthorized
 from entities.user import User
 from entities.blocklist import TokenBlockList
-from plugins.jwt import generate_tokens, renew_access_token
+from extensions.jwt import generate_tokens, renew_access_token
 
-auth_ns = Namespace('Authentication', path='/auth', description='Group of functionalities related to the user authentication.')
+auth_ns = Namespace('Authentication',
+                        path='/auth',
+                        description='Group of functionalities related to the user authentication.')
+
+# pylint: disable=no-self-use
 
 @auth_ns.route('/login')
 class LoginResource(Resource):
+    '''
+    Resource for user login.
+    '''
 
     login_model = auth_ns.model(name='Login', model={
         'username': fields.String(required=True, description='Username.'),
@@ -42,10 +52,14 @@ class LoginResource(Resource):
                 'refresh_token': refresh_token
             }
 
+        raise Unauthorized('Password verification failed.')
+
 @auth_ns.route('/logout')
 class LogoutResource(Resource):
-
-    @auth_ns.response(HTTPStatus.OK.value, 'Success')
+    '''
+    Resource for user logout.
+    '''
+    @auth_ns.response(HTTPStatus.NO_CONTENT.value, 'User loggedout successfully.')
     @auth_ns.response(HTTPStatus.BAD_REQUEST.value, 'Missing JWT Token.')
     @jwt_required()
     def post(self):
@@ -53,12 +67,16 @@ class LogoutResource(Resource):
         User system logout.
         '''
         token_block_list = TokenBlockList()
-        token_block_list.jti = get_jti()
+        token_block_list.jti = get_jwt()['jti']
         token_block_list.save()
 
-@auth_ns.route('/review')
-class ReviewAccessTokenResource(Resource):
+        return None, HTTPStatus.NO_CONTENT
 
+@auth_ns.route('/renew')
+class ReviewAccessTokenResource(Resource):
+    '''
+    Resource for user's token renew.
+    '''
     access_token_model = auth_ns.model(name='Access Token', model={
         'access_token': fields.String(required=True, description='Not fresh JWT Access Token.')
     })
@@ -71,7 +89,6 @@ class ReviewAccessTokenResource(Resource):
         '''
         Use a refresh token to create a new, not fresh, access_token.
         '''
-
         user = get_jwt_identity()
 
         return {

@@ -6,3 +6,4 @@ flask-migrate==2.7.0
 python-dotenv==0.15.0
 werkzeug==1.0.1
 gunicorn==20.0.4
+pylint==2.7.2
