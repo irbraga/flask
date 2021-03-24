@@ -1,4 +1,4 @@
-#.PHONY: cleanup lintproject unittests
+#.PHONY: cleanup lintproject unittests serve
 
 cleanup:
 	find . -type f -name '*.pyc' -delete
@@ -12,3 +12,6 @@ lintproject:
 unittests:
 	pytest --cov=app/
 	coverage html -d tests_coverage_report --title="Flask-Rest-Api unit test coverage"
+
+serve:
+	gunicorn -c gunicorn.py "wsgi:create_app()"

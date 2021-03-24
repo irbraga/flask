@@ -5,3 +5,4 @@ venv/
 virtualenv/
 .coverage
 database.db
+app.log

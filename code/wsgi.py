@@ -2,35 +2,27 @@
 Module with the Flask instance configuration using the factory pattern.
 '''
 from flask import Flask
-from flask.cli import ScriptInfo
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from werkzeug.exceptions import BadRequest, Unauthorized, InternalServerError
 from cli import db_cli
+from config import server_config
 from app.extensions.jwt import jwt_manager
 from app.extensions.sqlalchemy import db
 from app.blueprints.admin import admin_blueprint
 from app.blueprints.public import public_blueprint
 from app.blueprints.secured import secured_blueprint
-from config import DefaultConfig
 
 # pylint: disable=unused-variable
 
-def create_app(config):
+def create_app():
     '''
     Flask factory method.
     https://flask.palletsprojects.com/en/1.1.x/patterns/appfactories/
     '''
 
     app = Flask(__name__)
-
-    # Checking if the default object is used by FLask
-    if isinstance(config, ScriptInfo):
-        # Load default configuration
-        app.config.from_object(DefaultConfig)
-    else:
-        # If not, load the configuration file
-        app.config.from_object(config)
+    app.config.from_object(server_config)
 
     # Registering the Blueprints
     app.register_blueprint(admin_blueprint)
@@ -70,11 +62,10 @@ def create_app(config):
         '''
         At the end of a request, check if any exception occured.
         If it's True, rollback the session database transaction.
-        Otherwise, commit.
         '''
         if exception:
             db.session.rollback()
         else:
-            db.session.commit()
+            db.session.remove()
 
     return app

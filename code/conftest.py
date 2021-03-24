@@ -1,10 +1,10 @@
 '''
 Module to configure the application for tests.
 '''
+import os
 import datetime
 import pytest
 from wsgi import create_app
-from config import UnitTestConfig
 from app.extensions.sqlalchemy import db
 from app.entities.user import User
 
@@ -13,7 +13,10 @@ def app():
     '''
     Returns an instance of Flask configured for unit testing.
     '''
-    flask_app = create_app(UnitTestConfig)
+
+    os.environ['APP_CONFIG_ENVIRONMENT'] = 'unittest'
+
+    flask_app = create_app()
 
     # Push the application context to refer to Flask-SQAlquemy and
     # make it ready to work.
